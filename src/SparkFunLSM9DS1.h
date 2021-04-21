@@ -225,97 +225,6 @@ public:
 	//	- mRate = The desired output rate of the mag.
 	void setMagODR(uint8_t mRate);
 	
-	// configInactivity() -- Configure inactivity interrupt parameters
-	// Input:
-	//	- duration = Inactivity duration - actual value depends on gyro ODR
-	//	- threshold = Activity Threshold
-	//	- sleepOn = Gyroscope operating mode during inactivity.
-	//	  true: gyroscope in sleep mode
-	//	  false: gyroscope in power-down
-	void configInactivity(uint8_t duration, uint8_t threshold, bool sleepOn);
-	
-	// configAccelInt() -- Configure Accelerometer Interrupt Generator
-	// Input:
-	//	- generator = Interrupt axis/high-low events
-	//	  Any OR'd combination of ZHIE_XL, ZLIE_XL, YHIE_XL, YLIE_XL, XHIE_XL, XLIE_XL
-	//	- andInterrupts = AND/OR combination of interrupt events
-	//	  true: AND combination
-	//	  false: OR combination
-	void configAccelInt(uint8_t generator, bool andInterrupts = false);
-	
-	// configAccelThs() -- Configure the threshold of an accelereomter axis
-	// Input:
-	//	- threshold = Interrupt threshold. Possible values: 0-255.
-	//	  Multiply by 128 to get the actual raw accel value.
-	//	- axis = Axis to be configured. Either X_AXIS, Y_AXIS, or Z_AXIS
-	//	- duration = Duration value must be above or below threshold to trigger interrupt
-	//	- wait = Wait function on duration counter
-	//	  true: Wait for duration samples before exiting interrupt
-	//	  false: Wait function off
-	void configAccelThs(uint8_t threshold, lsm9ds1_axis axis, uint8_t duration = 0, bool wait = 0);
-	
-	// configGyroInt() -- Configure Gyroscope Interrupt Generator
-	// Input:
-	//	- generator = Interrupt axis/high-low events
-	//	  Any OR'd combination of ZHIE_G, ZLIE_G, YHIE_G, YLIE_G, XHIE_G, XLIE_G
-	//	- aoi = AND/OR combination of interrupt events
-	//	  true: AND combination
-	//	  false: OR combination
-	//	- latch: latch gyroscope interrupt request.
-	void configGyroInt(uint8_t generator, bool aoi, bool latch);
-	
-	// configGyroThs() -- Configure the threshold of a gyroscope axis
-	// Input:
-	//	- threshold = Interrupt threshold. Possible values: 0-0x7FF.
-	//	  Value is equivalent to raw gyroscope value.
-	//	- axis = Axis to be configured. Either X_AXIS, Y_AXIS, or Z_AXIS
-	//	- duration = Duration value must be above or below threshold to trigger interrupt
-	//	- wait = Wait function on duration counter
-	//	  true: Wait for duration samples before exiting interrupt
-	//	  false: Wait function off
-	void configGyroThs(int16_t threshold, lsm9ds1_axis axis, uint8_t duration, bool wait);
-	
-	// configInt() -- Configure INT1 or INT2 (Gyro and Accel Interrupts only)
-	// Input:
-	//	- interrupt = Select INT1 or INT2
-	//	  Possible values: XG_INT1 or XG_INT2
-	//	- generator = Or'd combination of interrupt generators.
-	//	  Possible values: INT_DRDY_XL, INT_DRDY_G, INT1_BOOT (INT1 only), INT2_DRDY_TEMP (INT2 only)
-	//	  INT_FTH, INT_OVR, INT_FSS5, INT_IG_XL (INT1 only), INT1_IG_G (INT1 only), INT2_INACT (INT2 only)
-	//	- activeLow = Interrupt active configuration
-	//	  Can be either INT_ACTIVE_HIGH or INT_ACTIVE_LOW
-	//	- pushPull =  Push-pull or open drain interrupt configuration
-	//	  Can be either INT_PUSH_PULL or INT_OPEN_DRAIN
-	void configInt(interrupt_select interupt, uint8_t generator,
-				   h_lactive activeLow = INT_ACTIVE_LOW, pp_od pushPull = INT_PUSH_PULL);
-				   
-	// configMagInt() -- Configure Magnetometer Interrupt Generator
-	// Input:
-	//	- generator = Interrupt axis/high-low events
-	//	  Any OR'd combination of ZIEN, YIEN, XIEN
-	//	- activeLow = Interrupt active configuration
-	//	  Can be either INT_ACTIVE_HIGH or INT_ACTIVE_LOW
-	//	- latch: latch gyroscope interrupt request.
-	void configMagInt(uint8_t generator, h_lactive activeLow, bool latch = true);
-	
-	// configMagThs() -- Configure the threshold of a gyroscope axis
-	// Input:
-	//	- threshold = Interrupt threshold. Possible values: 0-0x7FF.
-	//	  Value is equivalent to raw magnetometer value.
-	void configMagThs(uint16_t threshold);
-	
-	// getGyroIntSrc() -- Get contents of Gyroscope interrupt source register
-	uint8_t getGyroIntSrc();
-	
-	// getGyroIntSrc() -- Get contents of accelerometer interrupt source register
-	uint8_t getAccelIntSrc();
-	
-	// getGyroIntSrc() -- Get contents of magnetometer interrupt source register
-	uint8_t getMagIntSrc();
-	
-	// getGyroIntSrc() -- Get status of inactivity interrupt
-	uint8_t getInactivity();
-	
 	// sleepGyro() -- Sleep or wake the gyroscope
 	// Input:
 	//	- enable: True = sleep gyro. False = wake gyro.
@@ -458,39 +367,6 @@ protected:
 	// Helper Functions //
 	//////////////////////
 	void constrainScales();
-	
-	///////////////////
-	// SPI Functions //
-	///////////////////
-	// initSPI() -- Initialize the SPI hardware.
-	// This function will setup all SPI pins and related hardware.
-	void initSPI();
-	
-	// SPIwriteByte() -- Write a byte out of SPI to a register in the device
-	// Input:
-	//	- csPin = The chip select pin of the slave device.
-	//	- subAddress = The register to be written to.
-	//	- data = Byte to be written to the register.
-	void SPIwriteByte(uint8_t csPin, uint8_t subAddress, uint8_t data);
-	
-	// SPIreadByte() -- Read a single byte from a register over SPI.
-	// Input:
-	//	- csPin = The chip select pin of the slave device.
-	//	- subAddress = The register to be read from.
-	// Output:
-	//	- The byte read from the requested address.
-	uint8_t SPIreadByte(uint8_t csPin, uint8_t subAddress);
-	
-	// SPIreadBytes() -- Read a series of bytes, starting at a register via SPI
-	// Input:
-	//	- csPin = The chip select pin of a slave device.
-	//	- subAddress = The register to begin reading.
-	// 	- * dest = Pointer to an array where we'll store the readings.
-	//	- count = Number of registers to be read.
-	// Output: No value is returned by the function, but the registers read are
-	// 		all stored in the *dest array given.
-	uint8_t SPIreadBytes(uint8_t csPin, uint8_t subAddress, 
-							uint8_t * dest, uint8_t count);
 	
 	///////////////////
 	// I2C Functions //
